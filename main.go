@@ -2,6 +2,7 @@ package main
 
 import (
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 )
@@ -11,22 +12,28 @@ type HelloTemplateParams struct {
 	Name string
 }
 
+func writeTemplate(w io.Writer, path string, templateParams interface{}) error {
+	// instantiate a template from the file
+	t, err := template.ParseFiles(path)
+	if err != nil {
+		return err
+	}
+	// fill in the data from templateParams in the template and write the
+	// result to the ResponseWriter
+	if err := t.Execute(w, templateParams); err != nil {
+		return err
+	}
+	return nil
+}
+
 func hiHandler(w http.ResponseWriter, r *http.Request) {
 	// set up the parameters for the template
 	templateParams := HelloTemplateParams{
 		Name: r.URL.Path[1:],
 	}
-	// instantiate a template from the file
-	t, err := template.ParseFiles("templates/hello.html")
+	err := writeTemplate(w, "templates/hello.html", templateParams)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
-		return
-	}
-	// fill in the data from templateParams in the template and write the
-	// result to the ResponseWriter
-	if err := t.Execute(w, templateParams); err != nil {
-		http.Error(w, err.Error(), 500)
-		return
 	}
 }
 
