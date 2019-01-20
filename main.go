@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -37,9 +38,18 @@ func hiHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func applyKernelHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		fmt.Fprintln(w, "Oh, hi")
+	} else if r.Method == "POST" {
+		fmt.Fprintln(w, "TBD")
+	}
+}
+
 func main() {
-	// Set the handler function for the root URI
+	// Set handler functions
 	http.HandleFunc("/", hiHandler)
+	http.HandleFunc("/apply-kernel", applyKernelHandler)
 
 	// Start the server and log any error it returns. The call to
 	// http.ListenAndServe will only return when the server stops for some
