@@ -1,14 +1,26 @@
 package main
 
 import (
-	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 )
 
+// HelloTemplateParams holds the data needed to render the hello page
+type HelloTemplateParams struct {
+	Name string
+}
+
 func hiHandler(w http.ResponseWriter, r *http.Request) {
-	// Write directly to the ResponseWriter
-	fmt.Fprintf(w, "Hi there, %s!", r.URL.Path[1:])
+	// set up the parameters for the template
+	templateParams := HelloTemplateParams{
+		Name: r.URL.Path[1:],
+	}
+	// instantiate a template from the file
+	t, _ := template.ParseFiles("templates/hello.html")
+	// fill in the data from templateParams in the template and write the
+	// result to the ResponseWriter
+	t.Execute(w, templateParams)
 }
 
 func main() {
