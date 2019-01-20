@@ -40,7 +40,7 @@ func hiHandler(w http.ResponseWriter, r *http.Request) {
 
 func applyKernelHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		fmt.Fprintln(w, "Oh, hi")
+		writeTemplate(w, "templates/apply-kernel.html", nil)
 	} else if r.Method == "POST" {
 		fmt.Fprintln(w, "TBD")
 	}
