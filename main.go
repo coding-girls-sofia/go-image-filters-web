@@ -42,7 +42,13 @@ func applyKernelHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		writeTemplate(w, "templates/apply-kernel.html", nil)
 	} else if r.Method == "POST" {
-		fmt.Fprintln(w, "TBD")
+		file, handler, err := r.FormFile("image")
+		if err != nil {
+			http.Error(w, fmt.Sprintf("reading file filed: %s", err.Error()), 400)
+			return
+		}
+		defer file.Close()
+		fmt.Fprintln(w, handler.Header)
 	}
 }
 
