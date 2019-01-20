@@ -17,10 +17,17 @@ func hiHandler(w http.ResponseWriter, r *http.Request) {
 		Name: r.URL.Path[1:],
 	}
 	// instantiate a template from the file
-	t, _ := template.ParseFiles("templates/hello.html")
+	t, err := template.ParseFiles("templates/hello.html")
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
 	// fill in the data from templateParams in the template and write the
 	// result to the ResponseWriter
-	t.Execute(w, templateParams)
+	if err := t.Execute(w, templateParams); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
 }
 
 func main() {
