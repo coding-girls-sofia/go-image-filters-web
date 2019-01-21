@@ -3,12 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <title>Image kernels</title>
+    <style>
+        div.form-field {
+            display: block;
+                margin-top: 1em;
+                margin-bottom: 1em;
+        }
+        label:after {
+            content: ":";
+        }
+    </style>
 </head>
 <body>
     <form enctype="multipart/form-data" action="/apply-kernel" method="POST">
-        <input type="file" name="image" accept=".png,.jpg,.jpeg"/>
-        <input type="number" step="1" name="kernel-size">
-        <input type="submit" value="upload file" />
+        <div class="form-field">
+            <label>Image file</label>
+            <input type="file" name="image" accept=".png,.jpg,.jpeg"/>
+        </div>
+        <div class="form-field">
+            <label>Kernel size</label>
+            <input type="number" step="1" name="kernel-size">
+        </div>
+        <div class="form-field">
+            <input type="submit" value="upload file" />
+        </div>
     </form>
 </body>
 </html>
