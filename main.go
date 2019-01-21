@@ -10,6 +10,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/coding-girls-sofia/go-image-filters/kernel"
 )
 
 // HelloTemplateParams holds the data needed to render the hello page
@@ -57,14 +59,30 @@ func applyKernelHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		writeTemplate(w, "templates/apply-kernel.html", nil)
 	} else if r.Method == "POST" {
-		file, handler, err := r.FormFile("image")
+		file, _, err := r.FormFile("image")
 		if err != nil {
 			http.Error(w, fmt.Sprintf("reading file filed: %s", err.Error()), 400)
 			return
 		}
 		defer file.Close()
-		w.Header().Set("Content-Type", handler.Header.Get("Content-Type"))
-		io.Copy(w, file)
+
+		imageData, format, err := image.Decode(file)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("error decoding image from file %s", err.Error()), 400)
+			return
+		}
+		k := kernel.NewBlur(3)
+		processedImage, err := k.Apply(imageData)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("processing image failed: %s", err.Error()), 500)
+			return
+		}
+
+		w.Header().Set("Content-Type", format)
+		if err := writeImage(w, processedImage, format); err != nil {
+			http.Error(w, fmt.Sprintf("writing image response failed: %s", err.Error()), 500)
+			return
+		}
 	}
 }
 
