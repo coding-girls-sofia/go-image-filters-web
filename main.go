@@ -48,7 +48,8 @@ func applyKernelHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer file.Close()
-		fmt.Fprintln(w, handler.Header)
+		w.Header().Set("Content-Type", handler.Header.Get("Content-Type"))
+		io.Copy(w, file)
 	}
 }
 
