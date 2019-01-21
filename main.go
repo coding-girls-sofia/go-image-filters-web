@@ -55,30 +55,34 @@ func writeImage(w io.Writer, imageData image.Image, format string) error {
 	}
 }
 
+func blurImage(imageReader io.Reader, kernelSize int) (image.Image, string, error) {
+	imageData, format, err := image.Decode(imageReader)
+	if err != nil {
+		return nil, "", err
+	}
+	k := kernel.NewBlur(kernelSize)
+	processedImage, err := k.Apply(imageData)
+	if err != nil {
+		return nil, "", err
+	}
+
+	return processedImage, format, nil
+}
+
 func applyKernelHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		writeTemplate(w, "templates/apply-kernel.html", nil)
 	} else if r.Method == "POST" {
-		file, _, err := r.FormFile("image")
+		file, handler, err := r.FormFile("image")
 		if err != nil {
 			http.Error(w, fmt.Sprintf("reading file filed: %s", err.Error()), 400)
 			return
 		}
 		defer file.Close()
 
-		imageData, format, err := image.Decode(file)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("error decoding image from file %s", err.Error()), 400)
-			return
-		}
-		k := kernel.NewBlur(3)
-		processedImage, err := k.Apply(imageData)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("processing image failed: %s", err.Error()), 500)
-			return
-		}
+		processedImage, format, err := blurImage(file, 3)
 
-		w.Header().Set("Content-Type", format)
+		w.Header().Set("Content-Type", handler.Header.Get("Content-Type"))
 		if err := writeImage(w, processedImage, format); err != nil {
 			http.Error(w, fmt.Sprintf("writing image response failed: %s", err.Error()), 500)
 			return
