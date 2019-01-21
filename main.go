@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/coding-girls-sofia/go-image-filters/kernel"
 )
@@ -80,7 +81,12 @@ func applyKernelHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		defer file.Close()
 
-		processedImage, format, err := blurImage(file, 3)
+		kernelSize, err := strconv.Atoi(r.FormValue("kernel-size"))
+		if err != nil {
+			http.Error(w, fmt.Sprintf("reading kernel-size param filed: %s", err.Error()), 400)
+			return
+		}
+		processedImage, format, err := blurImage(file, kernelSize)
 
 		w.Header().Set("Content-Type", handler.Header.Get("Content-Type"))
 		if err := writeImage(w, processedImage, format); err != nil {
