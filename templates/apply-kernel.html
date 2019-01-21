@@ -7,6 +7,7 @@
 <body>
     <form enctype="multipart/form-data" action="/apply-kernel" method="POST">
         <input type="file" name="image" accept=".png,.jpg,.jpeg"/>
+        <input type="number" step="1" name="kernel-size">
         <input type="submit" value="upload file" />
     </form>
 </body>
