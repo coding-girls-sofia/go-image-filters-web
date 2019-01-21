@@ -1,8 +1,12 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
+	"image"
+	"image/jpeg"
+	"image/png"
 	"io"
 	"log"
 	"net/http"
@@ -35,6 +39,17 @@ func hiHandler(w http.ResponseWriter, r *http.Request) {
 	err := writeTemplate(w, "templates/hello.html", templateParams)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
+	}
+}
+
+func writeImage(w io.Writer, imageData image.Image, format string) error {
+	switch format {
+	case "jpeg":
+		return jpeg.Encode(w, imageData, nil)
+	case "png":
+		return png.Encode(w, imageData)
+	default:
+		return errors.New("Unknown format")
 	}
 }
 
